@@ -126,8 +126,10 @@ app.delete('/notes/:text_id', (req, res, next) => {
 
 // *** Code catch all here *** 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, './public, index.html'));
+  res.sendFile(path.join(__dirname, './Develop/public/index.html'));
 })
+
+
 //**** End of Catch Code ****/
 
 app.listen(PORT, () => {
