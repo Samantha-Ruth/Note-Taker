@@ -1,7 +1,6 @@
 const { randomUUID } = require('crypto');
 const express = require('express');
 const fs = require('fs');
-const { isGeneratorFunction } = require('util/types');
 const notes = require('./Develop/db/db.json');
 
 const PORT = process.env.PORT || 3001;
@@ -11,13 +10,44 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 
+function filterByQuery(query, notesArray) {
+  let filteredResults = notesArray;
+  if (query.text_id) {
+    filteredResults = filteredResults.filter(notes => notes.text_id === query.text_id);
+  }
+  return filteredResults;
+}
+
+//****  TRYING TO FILTER BY QUERY IF ITEMS ARE IN ARRAY,
+//****  BUT MIGHT NOT NEED **********
+// function filterByQuery(query, notesArray) {
+//   let textIDArray = [];
+//   let filteredResults = notesArray;
+//   if (query.text_id) {
+//     if (typeof query.text_id === 'string') {
+//       textIDArray = [query.text_id];
+//     } else {
+//       textIDArray = query.text_id;
+//     }
+//     textIDArray.forEach(id => {
+//       filteredResults = filteredResults.filter(
+//         notes => notes.text_id.indexOf(id) !==-1
+//         );
+//     });
+//   }
+//   return filteredResults;
+// }
+
 app.get("/api/notes", (req, res) => {
-    res.json(notes);
-    // need an error catcher here, but so far seems to do the job.
+  let results = notes;
+  if (req.query) {
+    results = filterByQuery(req.query, results);
+  }
+    res.json(results);
   });
 
 function findByID(text_id, notesArray) {
-  const result = notesArray.filter((note) => note.text_id === text_id)[0];
+  const result = notesArray.filter(note => note.text_id === text_id)[0];
   return result;
   }; 
 
@@ -29,12 +59,6 @@ app.get("/api/notes/:id", (req, res) => {
       res.send(404);
     }
 });
-
-
-  app.get("/api/notes", (req, res) => {
-    res.json(notes);
-    // need an error catcher here, but so far seems to do the job.
-  });
 
 app.post("/api/notes", (req, res) => {
   // log that a POST request was received
@@ -126,7 +150,7 @@ app.delete('/notes/:text_id', (req, res, next) => {
 
 // *** Code catch all here *** 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, './Develop/public/index.html'));
+  res.sendFile(path.join(__dirname, '../../public/index.html'));
 })
 
 
