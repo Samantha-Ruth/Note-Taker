@@ -5,7 +5,7 @@ const { notes } = require("../data/db.json");
 jest.mock('fs');
 test("creates a notes object", () => {
     const note = createNewNote(
-        { title: "Note_Test_1", text: "Note_Test_one", text_id: "987g6" },
+        { title: "Note_Test_1", text: "Note_Test_one", text_id: q3498 },
         notes
       );
 
