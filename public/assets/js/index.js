@@ -1,141 +1,205 @@
-const $inputForm = document.querySelector('#zookeeper-form');
+let noteTitle;
+let noteText;
+let saveNoteBtn;
+let newNoteBtn;
+let noteList;
 
+if (window.location.pathname === '/notes') {
+  noteTitle = document.querySelector('.note-title');
+  noteText = document.querySelector('.note-textarea');
+  saveNoteBtn = document.querySelector('.save-note');
+  newNoteBtn = document.querySelector('.new-note');
+  noteList = document.querySelectorAll('.list-container .list-group');
+}
 
-const handleAnimalFormSubmit = event => {
-  event.preventDefault();
+// Show an element
+const show = elem => {
+  elem.style.display = 'inline';
+};
 
-  // get animal data and organize it
-  const name = $animalForm.querySelector('[name="animal-name"]').value;
-  const species = $animalForm.querySelector('[name="species"]').value;
-  const dietRadioHTML = $animalForm.querySelectorAll('[name="diet"]');
-  let diet;
+// Hide an element
+const hide = elem => {
+  elem.style.display = 'none';
+};
 
-  for (let i = 0; i < dietRadioHTML.length; i += 1) {
-    if (dietRadioHTML[i].checkeds) {
-      diet = dietRadioHTML[i].value;
+// activeNote is used to keep track of the note in the textarea
+let activeNote = {};
+
+const getNotes = () =>
+  fetch('/api/notes', {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
     }
-  }
-
-  if (diet === undefined) {
-    diet = '';
-  }
-
-  const selectedTraits = $animalForm.querySelector('[name="personality"').selectedOptions;
-  const personalityTraits = [];
-  for (let i = 0; i < selectedTraits.length; i += 1) {
-    personalityTraits.push(selectedTraits[i].value);
-  }
-  const animalObject = { name, species, diet, personalityTraits };
-
-  fetch('/api/animals', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(animalObject)
-  })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      alert('Error: ' + response.statusText);
-    })
-    .then(postResponse => {
-      console.log(postResponse);
-      alert('Thank you for adding an animal!');
-    });
-};
-
-const handleZookeeperFormSubmit = event => {
-  event.preventDefault();
-
-  // get zookeeper data and organize it
-  const name = $zookeeperForm.querySelector('[name="zookeeper-name"]').value;
-  const age = parseInt($zookeeperForm.querySelector('[name="age"]').value);
-  const favoriteAnimal = $zookeeperForm.querySelector('[name="favorite-animal"]').value;
-
-  const zookeeperObject = { name, age, favoriteAnimal };
-  console.log(zookeeperObject);
-  fetch('/api/zookeepers', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(zookeeperObject)
-  })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      alert('Error: ' + response.statusText);
-    })
-    .then(postResponse => {
-      console.log(postResponse);
-      alert('Thank you for adding a zookeeper!');
-    });
-};
-
-$zookeeperForm.addEventListener('submit', handleZookeeperFormSubmit);
-$animalForm.addEventListener('submit', handleAnimalFormSubmit);
-
-
-
-
-const handleGetZookeepersSubmit = event => {
-  event.preventDefault();
-  const nameHTML = $zookeeperForm.querySelector('[name="name"]');
-  const name = nameHTML.value;
-
-  const ageHTML = $zookeeperForm.querySelector('[name="age"]');
-  const age = ageHTML.value;
-
-  const zookeeperObject = { name, age };
-
-  getZookeepers(zookeeperObject);
-};
-
-const printResults = resultArr => {
-  console.log(resultArr);
-
-  const animalHTML = resultArr.map(({ id, name, age, favoriteAnimal }) => {
-    return `
-  <div class="col-12 col-md-5 mb-3">
-    <div class="card p-3" data-id=${id}>
-      <h4 class="text-primary">${name}</h4>
-      <p>Age: ${age}<br/>
-      Favorite Animal: ${favoriteAnimal.substring(0, 1).toUpperCase() +
-        favoriteAnimal.substring(1)}<br/>
-      </p>
-    </div>
-  </div>
-    `;
   });
 
-  $displayArea.innerHTML = animalHTML.join('');
-};
-
-$zookeeperForm.addEventListener('submit', handleGetZookeepersSubmit);
-
-const getZookeepers = (formData = {}) => {
-  let queryUrl = '/api/zookeepers?';
-
+const newNote = (formData = {}) => {
+  let queryUrl = '/api/notes?';
+  
   Object.entries(formData).forEach(([key, value]) => {
     queryUrl += `${key}=${value}&`;
   });
+}
 
-  fetch(queryUrl)
-    .then(response => {
-      if (!response.ok) {
-        return alert('Error: ' + response.statusText);
-      }
+const saveNote = note =>
+  fetch('/api/notes', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(note)
+  })
+  .then(response => {
+    if (response.ok) {
       return response.json();
-    })
-    .then(zookeeperArr => {
-      console.log(zookeeperArr);
-      printResults(zookeeperArr);
-    });
+    }
+    alert('Error: ' + response.statusText);
+  })
+  .then(postResponse => {
+    console.log(postResponse);
+    alert('Note added!');
+  });
+
+const deleteNote = id =>
+  fetch(`/api/notes/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+const renderActiveNote = () => {
+  hide(saveNoteBtn);
+
+  if (activeNote.id) {
+    noteTitle.setAttribute('readonly', true);
+    noteText.setAttribute('readonly', true);
+    noteTitle.value = activeNote.title;
+    noteText.value = activeNote.text;
+  } else {
+    noteTitle.removeAttribute('readonly');
+    noteText.removeAttribute('readonly');
+    noteTitle.value = '';
+    noteText.value = '';
+  }
 };
 
-getZookeepers();
+const handleNoteSave = () => {
+  const newNote = {
+    title: noteTitle.value,
+    text: noteText.value
+  };
+  saveNote(newNote).then(() => {
+    getAndRenderNotes();
+    renderActiveNote();
+  });
+};
+
+// Delete the clicked note
+const handleNoteDelete = e => {
+  // Prevents the click listener for the list from being called when the button inside of it is clicked
+  e.stopPropagation();
+
+  const note = e.target;
+  const noteId = JSON.parse(note.parentElement.getAttribute('data-note')).id;
+
+  if (activeNote.id === noteId) {
+    activeNote = {};
+  }
+
+  deleteNote(noteId).then(() => {
+    getAndRenderNotes();
+    renderActiveNote();
+  });
+};
+
+// Sets the activeNote and displays it
+const handleNoteView = e => {
+  e.preventDefault();
+  activeNote = JSON.parse(e.target.parentElement.getAttribute('data-note'));
+  renderActiveNote();
+};
+
+// Sets the activeNote to and empty object and allows the user to enter a new note
+const handleNewNoteView = e => {
+  activeNote = {};
+  renderActiveNote();
+};
+
+const handleRenderSaveBtn = () => {
+  if (!noteTitle.value.trim() || !noteText.value.trim()) {
+    hide(saveNoteBtn);
+  } else {
+    show(saveNoteBtn);
+  }
+};
+
+// Render the list of note titles
+const renderNoteList = async notes => {
+  let jsonNotes = await notes.json();
+  if (window.location.pathname === '/notes') {
+    noteList.forEach(el => (el.innerHTML = ''));
+  }
+
+  let noteListItems = [];
+
+  // Returns HTML element with or without a delete button
+  const createLi = (text, delBtn = true) => {
+    const liEl = document.createElement('li');
+    liEl.classList.add('list-group-item');
+
+    const spanEl = document.createElement('span');
+    spanEl.classList.add('list-item-title');
+    spanEl.innerText = text;
+    spanEl.addEventListener('click', handleNoteView);
+
+    liEl.append(spanEl);
+
+    if (delBtn) {
+      const delBtnEl = document.createElement('i');
+      delBtnEl.classList.add(
+        'fas',
+        'fa-trash-alt',
+        'float-right',
+        'text-danger',
+        'delete-note'
+      );
+      delBtnEl.addEventListener('click', handleNoteDelete);
+
+      liEl.append(delBtnEl);
+    }
+
+    return liEl;
+  };
+
+  if (jsonNotes.length === 0) {
+    noteListItems.push(createLi('No saved Notes', false));
+  }
+
+  jsonNotes.forEach(note => {
+    const li = createLi(note.title);
+    li.dataset.note = JSON.stringify(note);
+
+    noteListItems.push(li);
+  });
+
+  if (window.location.pathname === '/notes') {
+    noteListItems.forEach(note => noteList[0].append(note));
+  }
+};
+
+// Gets notes from the db and renders them to the sidebar
+// const getAndRenderNotes = () => getNotes().then(renderNoteList);
+
+if (window.location.pathname === '/notes') {
+  saveNoteBtn.addEventListener('click', handleNoteSave);
+  newNoteBtn.addEventListener('click', handleNewNoteView);
+  noteTitle.addEventListener('keyup', handleRenderSaveBtn);
+  noteText.addEventListener('keyup', handleRenderSaveBtn);
+}
+
+// getAndRenderNotes();
+getNotes();
+renderNoteList();
