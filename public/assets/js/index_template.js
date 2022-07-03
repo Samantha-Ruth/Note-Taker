@@ -29,17 +29,37 @@ const getNotes = () =>
   fetch('/api/notes', {
     method: 'GET',
     headers: {
+      Accept: 'application/json',
       'Content-Type': 'application/json'
     }
   });
+
+const newNote = (formData = {}) => {
+  let queryUrl = '/api/notes?';
+  
+  Object.entries(formData).forEach(([key, value]) => {
+    queryUrl += `${key}=${value}&`;
+  });
+}
 
 const saveNote = note =>
   fetch('/api/notes', {
     method: 'POST',
     headers: {
+      Accept: 'application/json',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(note)
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    }
+    alert('Error: ' + response.statusText);
+  })
+  .then(postResponse => {
+    console.log(postResponse);
+    alert('Note added!');
   });
 
 const deleteNote = id =>
@@ -171,7 +191,7 @@ const renderNoteList = async notes => {
 };
 
 // Gets notes from the db and renders them to the sidebar
-const getAndRenderNotes = () => getNotes().then(renderNoteList);
+// const getAndRenderNotes = () => getNotes().then(renderNoteList);
 
 if (window.location.pathname === '/notes') {
   saveNoteBtn.addEventListener('click', handleNoteSave);
@@ -180,4 +200,6 @@ if (window.location.pathname === '/notes') {
   noteText.addEventListener('keyup', handleRenderSaveBtn);
 }
 
-getAndRenderNotes();
+// getAndRenderNotes();
+getNotes();
+renderNoteList();
