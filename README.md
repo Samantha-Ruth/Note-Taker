@@ -15,7 +15,7 @@ This project helped me understand how the back end is linked to the front throug
 
 ## Installation
 
-If the user already has node installed on their device, they can download this project and run "npm init" and then "npm i express" to download the express dependecy.  If they are interested in running the tests, enter "npm i --save-dev jest".  Next, the user should enter "node index.js" into their command line to start the user prompts.
+If the user already has node installed on their device, they can download this project and run "npm init" and then "npm i express" to download the express dependecy.  If they are interested in running the tests, enter "npm i --save-dev jest".  Next, the user should enter "npm start" to launch the server and then view the website at localhost:3001.
 
 ## Usage
 
