@@ -1,14 +1,16 @@
 const router = require("express").Router();
-const { filterByQuery, findById, createNewNote, validateNote, } = require("../../lib/notes");
-const { notes } = require("../../data/db.json")
+const {findById, createNewNote, validateNote, deleteNote} = require("../../lib/notes");
+const notes = require("../../data/db.json")
 
-
-router.get("/notes", (req, res) => {
-  let results = notes;
-  if (req.query) {
-    results = filterByQuery(req.query, results);
+router.get('/notes', (req, res) => {
+  console.log("GET route hit!");
+  console.info(`${req.method} request was received to view all notes.`);
+  const result = notes;
+  if (result) {
+    res.json(result);
+  } else {
+    res.send(400);
   }
-  res.json(results);
 });
 
 router.get("/notes/:id", (req, res) => {
@@ -32,6 +34,20 @@ router.post("/notes", (req, res) => {
     res.json(note);
   }
 });
+
+// **** NOT WORKING!!!! ****  ... does this need to work? 
+router.put("/notes:id", (req, res) => {
+  console.log("PUT route hit!");
+  console.info(`${req.method} request was received to edit a note`);
+  const result = findById(req.params.id, notes);
+  // if (!validateNote(req.body)) {
+  //   res.status(400).send("This note is not properly formatted.")
+  // } else {
+    const note = editNote(req.body, notes);
+    res.json(note);
+  }
+);
+
 
 // ****  APP DELETE HERE *** 
 // app.delete("/api/notes", (req, res) => {

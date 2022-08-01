@@ -200,6 +200,6 @@ if (window.location.pathname === '/notes') {
   noteText.addEventListener('keyup', handleRenderSaveBtn);
 }
 
-// getAndRenderNotes();
-getNotes();
-renderNoteList();
+getAndRenderNotes();
+// getNotes();
+// renderNoteList();
