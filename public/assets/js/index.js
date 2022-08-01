@@ -34,13 +34,13 @@ const getNotes = () =>
     }
   });
 
-const newNote = (formData = {}) => {
-  let queryUrl = '/api/notes?';
+// const newNote = (formData = {}) => {
+//   let queryUrl = '/api/notes';
   
-  Object.entries(formData).forEach(([key, value]) => {
-    queryUrl += `${key}=${value}&`;
-  });
-}
+//   Object.entries(formData).forEach(([key, value]) => {
+//     queryUrl += `${key}=${value}&`;
+//   });
+// }
 
 const saveNote = note =>
   fetch('/api/notes', {
@@ -50,16 +50,16 @@ const saveNote = note =>
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(note)
-  })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    }
-    alert('Error: ' + response.statusText);
-  })
-  .then(postResponse => {
-    console.log(postResponse);
-    alert('Note added!');
+  // })
+  // .then(response => {
+  //   if (response.ok) {
+  //     return response.json();
+  //   }
+  //   alert('Error: ' + response.statusText);
+  // })
+  // .then(postResponse => {
+  //   console.log(postResponse);
+  //   alert('Note added!');
   });
 
 const deleteNote = id =>
@@ -191,7 +191,7 @@ const renderNoteList = async notes => {
 };
 
 // Gets notes from the db and renders them to the sidebar
-// const getAndRenderNotes = () => getNotes().then(renderNoteList);
+const getAndRenderNotes = () => getNotes().then(renderNoteList);
 
 if (window.location.pathname === '/notes') {
   saveNoteBtn.addEventListener('click', handleNoteSave);

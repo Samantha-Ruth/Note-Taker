@@ -21,6 +21,7 @@ router.get("/notes/:id", (req, res) => {
 });
 
 router.post("/notes", (req, res) => {
+  console.log("post route hit!");
   // log that a POST request was received
   console.info(`${req.method} request was received to add a note`);
   // Maybe validation is within the IF TITLE AND TEXT
