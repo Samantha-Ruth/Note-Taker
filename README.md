@@ -46,7 +46,7 @@ Image of working "POST":
 
 Link to video of project: 
 
-The link to the project is here: https://samantha-ruth.github.io/Note-Taker/
+The link to the project is here: https://stark-journey-80050.herokuapp.com/
 
 The url of the Git repository is here: https://github.com/Samantha-Ruth/Note-Taker
 
