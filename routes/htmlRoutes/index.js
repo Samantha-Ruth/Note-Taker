@@ -1,6 +1,5 @@
 const path = require('path');
 const router = require('express').Router();
-// require("/Users/samshomefolder/bootcamp/CU-VIRT-BO-FSF-PT-04-2022-U-B/11-Express/02-Challenge/Note-Taker/public/index.html")
 
 // *** Code catch all here *** 
 router.get('/', (req, res) => {

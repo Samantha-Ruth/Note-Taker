@@ -7,11 +7,12 @@ router.get('/notes', (req, res) => {
   console.info(`${req.method} request was received to view all notes.`);
   const result = notes;
   if (result) {
-    res.json(result);
+      res.json(result);
   } else {
-    res.send(400);
+      res.sendStatus(400);
   }
 });
+
 
 router.get("/notes/:id", (req, res) => {
   const result = findById(req.params.id, notes);
